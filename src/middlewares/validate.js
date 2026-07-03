@@ -1,14 +1,17 @@
-const HttpEError = require('http-errors');
+const createError = require('http-errors');
 
 function validate(schema) {
     return (req, res, next) => {
-        const { error } = schema.validate(req.body);
-        if (error) {
-            return next(new HttpEError(400, error.details[0].message));
+        const result = schema.safeParse(req.body);
+
+        if (!result.success) {
+            const firstIssue = result.error.issues[0];
+            return next(createError(400, firstIssue ? firstIssue.message : 'Invalid request payload'));
         }
-        next();
+
+        req.body = result.data;
+        return next();
     };
 }
-
 
 module.exports = validate;
