@@ -140,7 +140,7 @@ Authenticates a user and returns a JWT token.
 ### Logout
 
 ```http
-GET /api/v1/auth/logout
+POST /api/v1/auth/logout
 ```
 
 Logs out the authenticated user.
