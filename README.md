@@ -11,7 +11,6 @@ A simple full-stack Task Management application with user authentication and CRU
 - React 19
 - TypeScript
 - Tailwind CSS 4
-- Axios
 
 ### Backend
 - Node.js
