@@ -1,7 +1,10 @@
 const express = require('express');
 const taskController = require('../controllers/taskController');
 
+const HttpError = require("../utils/httpError");
 const router = express.Router();
+
+let tasks = [];
 
 router.post('/', taskController.createTask);
 router.get('/', taskController.getAllTasks);

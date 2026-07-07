@@ -1,71 +1,82 @@
 const HttpError = require('../utils/httpError');
 
+const tasks = [];
+
 function createTask(req, res, next) {
-    const { title, completed, userId } = req.body;
+    const { title, completed } = req.body;
 
     if (!title) {
         return next(new HttpError(400, "Title is required"));
     }
 
+    const task = {
+        id: Date.now().toString(),
+        title,
+        completed: completed || false,
+    };
+
+    tasks.push(task);
+
     return res.status(201).json({
         message: "Task created successfully",
-        task: {
-            title,
-            completed: completed || false,
-            userId
-        }
+        task,
     });
 }
 
-function updateTask(req, res, next) {
+async function updateTask(req, res, next) {
     const { id } = req.params;
     const { title, completed } = req.body;
 
-    if (!title && completed === undefined) {
-        return next(
-            new HttpError(
-                400,
-                "At least one field (title or completed) is required"
-            )
-        );
+    const task = tasks.find((t) => t.id === id);
+
+    if (!task) {
+        return next(new HttpError(404, "Task not found"));
     }
+
+    if (title !== undefined) task.title = title;
+    if (completed !== undefined) task.completed = completed;
 
     return res.status(200).json({
         message: "Task updated successfully",
-        task: {
-            id,
-            title,
-            completed
-        }
+        task,
     });
 }
 
-function deleteTask(req, res) {
+function deleteTask(req, res, next) {
     const { id } = req.params;
+
+    const index = tasks.findIndex((t) => t.id === id);
+
+    if (index === -1) {
+        return next(new HttpError(404, "Task not found"));
+    }
+
+    tasks.splice(index, 1);
 
     return res.status(200).json({
         message: "Task deleted successfully",
-        taskId: id
     });
 }
 
 function getAllTasks(req, res) {
     return res.status(200).json({
         message: "Tasks retrieved successfully",
-        tasks: []
+        tasks,
     });
 }
 
-function getTaskById(req, res) {
+function getTaskById(req, res, next) {
     const { id } = req.params;
+
+    const task = tasks.find((t) => t.id === id);
+
+    if (!task) {
+        return next(new HttpError(404, "Task not found"));
+    }
 
     return res.status(200).json({
         message: "Task retrieved successfully",
-        task: {
-            id,
-            title: "Sample Task",
-            completed: false
-        }
+        task,
     });
 }
 
